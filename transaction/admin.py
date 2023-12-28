@@ -6,9 +6,9 @@ from. views import send_transaction_mail
 # Register your models here.
 @admin.register(transactions)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display=['account', 'amount', 'balance_after_transaction', 'transaction_type', 'loan_approve','is_bankrupt']
+    list_display=['account', 'amount', 'balance_after_transaction', 'transaction_type', 'loan_approve']
     def save_model(self, request, obj, form, change):
-        if obj.loan_approve==True and obj.is_bankrupt==False:
+        if obj.loan_approve==True:
             obj.account.balance+=obj.amount
             obj.balance_after_transaction=obj.account.balance
             obj.account.save()

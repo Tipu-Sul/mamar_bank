@@ -72,25 +72,18 @@ class WithdrawMoneyView(TransactionCreateMixin):
         return initial
 
     def form_valid(self, form):
-        bankrupt=transactions.objects.get(id=self.request.user.id)
-        if bankrupt.is_bankrupt==False:
-            amount=form.cleaned_data.get('amount')
-            account=self.request.user.account
-            account.balance-=amount
-            account.save(
-                update_fields=['balance']
-            )
-            messages.success(self.request,f"{'{:,.2f}'.format(float(amount))} $ is withdraw from your account successfully")
-            sub="Withdrawal Message"
-            template='transaction/withdraw_mail.html'
-            send_transaction_mail(self.request.user,amount,sub,template)
-        
-
-
-            return super().form_valid(form)
-        else:
-            messages.warning(self.request,"bank is bankrupt")
-            return redirect('home')
+        amount=form.cleaned_data.get('amount')
+        account=self.request.user.account
+        account.balance-=amount
+        account.save(
+            update_fields=['balance']
+        )
+        messages.success(self.request,f"{'{:,.2f}'.format(float(amount))} $ is withdraw from your account successfully")
+        sub="Withdrawal Message"
+        template='transaction/withdraw_mail.html'
+        send_transaction_mail(self.request.user,amount,sub,template)
+        return super().form_valid(form)
+    
 class LoanRequstView(TransactionCreateMixin):
     form_class=LoanRequestForm
     title="Request For Loan"
