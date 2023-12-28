@@ -56,7 +56,7 @@ class DepositeMoneyView(TransactionCreateMixin):
         account.save(
             update_fields=['balance']
         )
-        messages.success(self.request,f"{'{:,.2f}'.format(float(amount))} has been  deposited in your account")
+        messages.success(self.request,f"{'{:,.2f}'.format(float(amount))} $ has been  deposited in your account")
         sub="Deposite Message"
         template='transaction/deposite_mail.html'
         send_transaction_mail(self.request.user,amount,sub,template)
@@ -80,7 +80,7 @@ class WithdrawMoneyView(TransactionCreateMixin):
             account.save(
                 update_fields=['balance']
             )
-            messages.success(self.request,f"${amount} is withdraw from your account successfully")
+            messages.success(self.request,f"{'{:,.2f}'.format(float(amount))} $ is withdraw from your account successfully")
             sub="Withdrawal Message"
             template='transaction/withdraw_mail.html'
             send_transaction_mail(self.request.user,amount,sub,template)
@@ -106,8 +106,8 @@ class LoanRequstView(TransactionCreateMixin):
         if current_loan_count>=3:
             return HttpResponse('You already crossed your limits')
       
-        messages.success(self.request,f"${amount} loan amount request  submited successfully")
-        sub="Loan Application Message"
+        messages.success(self.request,f"{'{:,.2f}'.format(float(amount))} $ loan amount request  submited successfully")
+        sub="Loan A pplication Message"
         template='transaction/loan_mail.html'
         send_transaction_mail(self.request.user,amount,sub,template)
         
