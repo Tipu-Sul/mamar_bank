@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block head_title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div style="width: 50%; margin: auto;">
+
+  <form method="post">
+    <h1>Transfer Form</h1>
+
+    {% csrf_token %}
+    
+    {{ form | crispy }}
+    <div class="flex w-full justify-center">
+        <button class="bg-blue-900 text-white hover:text-blue-900 hover:bg-white border border-blue-900 font-bold px-4 py-2 rounded-lg" type="submit">Submit</button>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

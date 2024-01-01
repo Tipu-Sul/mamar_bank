@@ -1,8 +1,8 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from. forms import DepositeForm,WithdrawalForm,LoanRequestForm
+from. forms import DepositeForm,WithdrawalForm,LoanRequestForm,TransferForm
 from django.views.generic import CreateView,ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from.models import transactions
+from.models import transactions,BankRupt
 from.constants import DEPOSITE,LOAN_PAID,LOAN,WITHDRAWAL,TRANSFER
 from django.contrib import messages
 from django.http import HttpResponse
@@ -100,7 +100,7 @@ class LoanRequstView(TransactionCreateMixin):
             return HttpResponse('You already crossed your limits')
       
         messages.success(self.request,f"{'{:,.2f}'.format(float(amount))} $ loan amount request  submited successfully")
-        sub="Loan A pplication Message"
+        sub="Loan Application Message"
         template='transaction/loan_mail.html'
         send_transaction_mail(self.request.user,amount,sub,template)
         
@@ -159,4 +159,46 @@ class LoanListView(LoginRequiredMixin,ListView):
         user_account=self.request.user.account
         queryset=transactions.objects.filter(account=user_account, transaction_type=LOAN)
         return queryset
+
+class TransferMoneyView(LoginRequiredMixin,View):
+    template_name='transaction/transfer_form.html'
+    form_class=TransferForm
+    # status=BankRupt.objects.filter(is_bankrupt=False)
+    account_numbers=UserBankAccount.objects.values_list('account_number',flat=True)
+
+    def get(self,request, *args, **kwargs):
+        form=self.form_class()
+        return render(request,self.template_name,{'form':form})
+    
+    def post(self,request, *args, **kwargs):
+        form=self.form_class(request.POST)
+        if form.is_valid():
+            if not BankRupt.objects.filter(is_bankrupt=True).exists():
+                tar_account=form.cleaned_data['account']
+                amount=form.cleaned_data['amount']
+                if tar_account not in self.account_numbers:
+                    messages.warning(self.request,"Invalid Account")
+                    return redirect('transaction_report')
+                else:
+                    account=request.user.account
+                    tar_user=UserBankAccount.objects.get(account_number=tar_account)
+                    account.balance-=amount
+                    tar_user.balance+=amount
+                    account.save(
+                        update_fields=['balance']
+                    )
+                    tar_user.save(
+                       update_fields=['balance'] 
+                    )
+                    messages.success(self.request, f"Request for ${amount} transfer successful")
+                    sub="Transfer Money Message"
+                    template="transaction/transfer_mail.html"
+                    send_transaction_mail(self.request.user,amount,sub,template)
+                    return redirect('transaction_report')
+            else:
+                messages.warning(self.request,"Bank is BankRupt")
+                return redirect('transaction_report')
+        return render(request,self.template_name,{'form':form})
+
+
 

@@ -16,3 +16,8 @@ class transactions(models.Model):
         ordering =['timestamp']
 
 
+class BankRupt(models.Model):
+    is_bankrupt=models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.is_bankrupt)

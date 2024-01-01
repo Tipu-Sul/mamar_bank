@@ -1,6 +1,6 @@
 from typing import Any
 from django.contrib import admin
-from. models import transactions
+from. models import transactions,BankRupt
 from. views import send_transaction_mail
 
 # Register your models here.
@@ -14,3 +14,6 @@ class TransactionAdmin(admin.ModelAdmin):
             obj.account.save()
             send_transaction_mail(obj.account.user, obj.amount,"Loan Approval","transaction/conform_loan_mail.html")
             super().save_model(request, obj, form, change)
+
+admin.site.register(BankRupt)
+

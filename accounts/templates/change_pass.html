@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block head_title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div style="width: 50%; margin: auto;">
+
+  <form method="post">
+    <h1>Password Change Form</h1>
+    {% if form.non_field_errors %}
+    {% for er in forms.non_field_errors %}
+    <p class="bg-red-700 justify-center">{{er}}</p>
+    {% endfor %}
+    {% endif %}
+    {% csrf_token %}
+    
+    {{ form | crispy }}
+    <!-- {% for fm in form %}
+    {{ fm.label_tag }}
+    {{ fm | crispy }}
+   <p class="bg-red-500"> {{ fm.errors | striptags }}</p>
+    {% endfor %} -->
+    <br>
+    <div class="flex w-full justify-center">
+        <button class="bg-blue-900 text-white hover:text-blue-900 hover:bg-white border border-blue-900 font-bold px-4 py-2 rounded-lg" type="submit">Submit</button>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}
