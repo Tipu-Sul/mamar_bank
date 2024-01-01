@@ -182,6 +182,7 @@ class TransferMoneyView(LoginRequiredMixin,View):
                 else:
                     account=request.user.account
                     tar_user=UserBankAccount.objects.get(account_number=tar_account)
+                    print (tar_user.user.first_name)
                     account.balance-=amount
                     tar_user.balance+=amount
                     account.save(
@@ -194,6 +195,10 @@ class TransferMoneyView(LoginRequiredMixin,View):
                     sub="Transfer Money Message"
                     template="transaction/transfer_mail.html"
                     send_transaction_mail(self.request.user,amount,sub,template)
+                    
+                    sub="Received Money Message"
+                    template="transaction/receive_money_mail.html"
+                    send_transaction_mail(tar_user.user,amount,sub,template)
                     return redirect('transaction_report')
             else:
                 messages.warning(self.request,"Bank is BankRupt")
